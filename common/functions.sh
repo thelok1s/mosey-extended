@@ -95,7 +95,7 @@ cp_ch() {
 
 install_script() {
   case "$1" in
-    -b) shift; 
+    -b) shift;
         if $KSU; then
           local INPATH=$NVBASE/boot-completed.d
         else
@@ -148,7 +148,7 @@ mount_mirrors() {
 
 # Credits
 ui_print "**************************************"
-ui_print "*   MMT Extended by Zackptg5 @ XDA   *"
+ui_print "*  mosey-extended by lok1s @ GitHub  *"
 ui_print "**************************************"
 ui_print " "
 
@@ -267,7 +267,7 @@ for i in $(find $MODPATH -type f -name "*.sh" -o -name "*.prop" -o -name "*.rule
     "$MODPATH/boot-completed.sh") install_script -b $i;;
     "$MODPATH/service.sh") install_script -l $i;;
     "$MODPATH/post-fs-data.sh") install_script -p $i;;
-    "$MODPATH/uninstall.sh") if [ -s $INFO ] || [ "$(head -n1 $MODPATH/uninstall.sh)" != "# Don't modify anything after this" ]; then                          
+    "$MODPATH/uninstall.sh") if [ -s $INFO ] || [ "$(head -n1 $MODPATH/uninstall.sh)" != "# Don't modify anything after this" ]; then
                                cp -f $MODPATH/uninstall.sh $MODPATH/$MODID-uninstall.sh # Fallback script in case module manually deleted
                                sed -i "1i[ -d \"\$MODPATH\" ] && exit 0" $MODPATH/$MODID-uninstall.sh
                                echo 'rm -f $0' >> $MODPATH/$MODID-uninstall.sh
@@ -280,7 +280,7 @@ for i in $(find $MODPATH -type f -name "*.sh" -o -name "*.prop" -o -name "*.rule
   esac
 done
 
-$IS64BIT || for i in $(find $MODPATH/system -type d -name "lib64"); do rm -rf $i 2>/dev/null; done  
+$IS64BIT || for i in $(find $MODPATH/system -type d -name "lib64"); do rm -rf $i 2>/dev/null; done
 [ -d "/system/priv-app" ] || mv -f $MODPATH/system/priv-app $MODPATH/system/app 2>/dev/null
 [ -d "/system/xbin" ] || mv -f $MODPATH/system/xbin $MODPATH/system/bin 2>/dev/null
 if $DYNLIB; then

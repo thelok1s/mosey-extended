@@ -1,7 +1,7 @@
-id=MMT-Ex
-name=Magisk Module Template Extended
-version=v3.7
-versionCode=19
-author=Zackptg5
-description=Magisk Module Template Extended
+id=mosey-extended
+name=mosey-extended
+version=v1.0
+versionCode=1
+author=lok1s
+description=Module which enables Airdrop in Quick Share for pixels below 10 (or any android whatsoever)
 updateJson=https://raw.githubusercontent.com/Zackptg5/MMT-Extended/master/update.json
