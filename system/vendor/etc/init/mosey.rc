@@ -2,8 +2,8 @@ on boot
     start mosey_server
 
 service mosey_server /vendor/bin/mosey_server
-    class late_start
     user system
     group system inet
-    capabilities NET_ADMIN NET_RAW
+    disabled
     oneshot
+    capabilities NET_ADMIN NET_RAW

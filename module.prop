@@ -1,6 +1,6 @@
 id=mosey-extended
 name=mosey-extended
-version=v2.0
-versionCode=2
+version=v3.0
+versionCode=3
 author=lok1s
-description=Module which enables Airdrop in Quick Share for pixels below 10 (or any android whatsoever)
+description=Enables Quick Share mosey AirDrop transport on Pixel 8 Pro and other non-Pixel-10 devices via Phenotype injection + MoseyApp reinstall

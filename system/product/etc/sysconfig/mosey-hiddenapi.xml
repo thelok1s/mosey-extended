@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+    <hidden-api-whitelisted-app package="com.google.android.mosey" />
+    <!-- Make MoseyApp visible to all packages (including GMS Nearby resolver)
+         regardless of install location. Prevents AppsFilter BLOCKED. -->
+    <force-queryable-apps>
+        <package name="com.google.android.mosey" />
+    </force-queryable-apps>
+</config>

@@ -1,4 +1,82 @@
-allow mosey_server servicemanager:binder call;
-allow servicemanager mosey_server:binder call;
+# Type declarations
+type mosey_server;
+typeattribute mosey_server domain;
+typeattribute mosey_server vendor_domain;
+type mosey_server_exec;
+typeattribute mosey_server_exec file_type;
+typeattribute mosey_server_exec exec_type;
+typeattribute mosey_server_exec vendor_file_type;
+type mosey_service;
+typeattribute mosey_service service_manager_type;
+typeattribute mosey_service hal_service_type;
+# mosey_app is the companion MoseyApp.apk type — declare even if APK not installed
+# so mosey_server binder callbacks don't AVC-crash on unknown type
+type mosey_app;
+typeattribute mosey_app domain;
+
+# Domain transition: init executes mosey_server_exec → gets mosey_server domain
+allow init mosey_server_exec:file { read getattr map execute open };
+allow init mosey_server:process { transition siginh rlimitinh };
+allow mosey_server mosey_server_exec:file { read getattr map execute open entrypoint };
+type_transition init mosey_server_exec:process mosey_server;
+
+# Binder / service registration
+allow mosey_server servicemanager:binder { call transfer };
+allow servicemanager mosey_server:binder { call transfer };
 allow mosey_server mosey_service:service_manager { add find };
+# Wild KSU ignores type_transition, so mosey_server actually runs as 'su' domain
+# (service.sh path) or 'init' domain (mosey.rc path). Add service_manager add for both.
+allow su mosey_service:service_manager { add find };
+allow su servicemanager:binder { call transfer };
+allow servicemanager su:binder { call transfer };
+allow init mosey_service:service_manager { add find };
+allow init servicemanager:binder { call transfer };
+allow servicemanager init:binder { call transfer };
+
+# Capabilities (NET_ADMIN: interface mgmt; NET_RAW: raw 802.11 packet socket)
 allow mosey_server self:capability { net_admin net_raw };
+
+# sysfs_net — interface config reads (e.g. /sys/class/net/wlan0/...)
+allow mosey_server sysfs_net:dir { ioctl read getattr lock open watch watch_reads search };
+allow mosey_server sysfs_net:file { ioctl read getattr lock map open watch watch_reads };
+allow mosey_server sysfs_net:lnk_file { ioctl read getattr lock map open watch watch_reads };
+
+# UDP socket — used for SIOCG*/SIOCS* interface ioctls
+allow mosey_server self:udp_socket { ioctl create };
+# ioctl numbers: SIOCGIFINDEX=0x8933 SIOCGIFFLAGS=0x8913 SIOCSIFFLAGS=0x8914
+#   SIOCGIFMTU=0x8921 SIOCSIFMTU=0x8922 SIOCGIFHWADDR=0x8927 SIOCADDRT=0x890B
+#   SIOCDIFADDR=0x8936 SIOCGIFNAME=0x8910 NL80211 private=0x89f1 etc.
+allowxperm mosey_server self:udp_socket ioctl { 0x8913-0x8914 0x8916 0x8922 0x8924 0x8936 0x8946 0x8994 0x89f1 };
+
+# Unix datagram socket ioctls (used for netlink helper paths)
+allow mosey_server self:unix_dgram_socket ioctl;
+allowxperm mosey_server self:unix_dgram_socket ioctl { 0x8913-0x8914 0x8946 0x8994 };
+
+# Packet socket — raw 802.11 action frame Tx/Rx via radiotap0/wonder0
+allow mosey_server self:packet_socket { ioctl read write create getattr setattr lock append map bind connect listen accept getopt setopt shutdown };
+# SIOCGIFINDEX=0x8913 SIOCGIFHWADDR=0x8927 SIOCGIFFLAGS=0x8933
+allowxperm mosey_server self:packet_socket ioctl { 0x8913 0x8927 0x8933 };
+
+# Netlink route socket — route/address management for mosey0 TUN interface
+allow mosey_server self:netlink_route_socket { read write create nlmsg_read nlmsg_write nlmsg_readpriv nlmsg_getneigh };
+
+# Netlink netfilter socket
+allow mosey_server self:netlink_netfilter_socket create;
+
+# Netlink generic socket — NL80211 channel control / Wi-Fi Aware
+allow mosey_server self:netlink_generic_socket { ioctl read write create getattr setattr lock append map bind connect getopt setopt shutdown };
+# SIOCGIWNAME=0x8946 (used to probe NL80211 family ID)
+allowxperm mosey_server self:netlink_generic_socket ioctl { 0x8946 };
+
+# TUN device — mosey0 virtual interface for IPv6 data plane
+allow mosey_server tun_device:chr_file { ioctl read write getattr lock append map open watch watch_reads };
+# TUNSETIFF=0x400454ca TUNSETPERSIST=0x400454d2
+allowxperm mosey_server tun_device:chr_file ioctl { 0x54ca 0x54d2 };
+allow mosey_server self:tun_socket create;
+
+# All app domains can find and call mosey_server
+# (covers GMS as priv_app, MoseyApp as mosey_app, any caller app)
+allow appdomain mosey_service:service_manager find;
+allow appdomain mosey_server:binder { call transfer };
+allow mosey_server appdomain:binder transfer;
+allow appdomain mosey_server:fd use;

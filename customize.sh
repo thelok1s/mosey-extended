@@ -18,9 +18,6 @@ REPLACE="
 ##########################################################################################
 
 set_permissions() {
-  # Sysconfig overlay created at install-time (from payload/)
-  set_perm_recursive $MODPATH/system/product/etc/sysconfig 0 0 0755 0644
-
   # Mosey native service binary + init rc (vendor)
   # /vendor/bin/mosey_server
   set_perm $MODPATH/system/vendor/bin/mosey_server 0 0 0755 u:object_r:mosey_server_exec:s0

@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<!--
+    This file contains permissions to be granted by default. Default
+    permissions are granted to special platform components and to apps
+    that are approved to get default grants. The special components
+    are apps that are expected to work out-of-the-box as they provide
+    core use cases such as default dialer, default email, etc. These
+    grants are managed by the platform. The apps that are additionally
+    approved for default grants are ones that provide carrier specific
+    functionality, ones legally required at some location, ones providing
+    alternative disclosure and opt-out UI, ones providing highlight features
+    of a dedicated device, etc. This file contains only the latter exceptions.
+    Fixed permissions cannot be controlled by the user and need a special
+    approval. Typically these are to ensure either legally mandated functions
+    or the app is considered a part of the OS.
+-->
+<exceptions>
+  <exception package="com.google.android.mosey">
+    <permission name="android.permission.BLUETOOTH_SCAN"/>
+    <permission name="android.permission.BLUETOOTH_ADVERTISE" />
+    <permission name="android.permission.BLUETOOTH_CONNECT" />
+    <permission name="android.permission.NEARBY_WIFI_DEVICES" />
+    <permission name="android.permission.ACCESS_FINE_LOCATION" />
+    <permission name="android.permission.ACCESS_COARSE_LOCATION" />
+    <permission name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+  </exception>
+</exceptions>
+
