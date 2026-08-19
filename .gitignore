@@ -1,2 +1,5 @@
 __MACOSX
 .DS_Store
+out/
+mosey-extended.zip
+system/vendor/lib/modules/wonder_mosey_wild.ko

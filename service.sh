@@ -21,7 +21,9 @@ BIN="/vendor/bin/mosey_server"
 SQLITE3="$MODULE_DIR/system/vendor/bin/sqlite3_mosey"
 [ -x "$SQLITE3" ] || SQLITE3=""
 
-log "service.sh invoked (MODDIR=$MODDIR, MODULE_DIR=$MODULE_DIR, BIN=$BIN, sqlite3=${SQLITE3:-none})"
+DEV_CODENAME="$(getprop ro.product.device 2>/dev/null)"
+DEV_MODEL="$(getprop ro.product.model 2>/dev/null)"
+log "service.sh invoked (MODDIR=$MODDIR, MODULE_DIR=$MODULE_DIR, BIN=$BIN, sqlite3=${SQLITE3:-none}, device=${DEV_CODENAME:-unknown}/${DEV_MODEL:-unknown})"
 
 # Wait for Android boot to complete (and for KSU mounts to settle)
 i=0
@@ -164,6 +166,7 @@ if [ -n "$phenotype_db" ]; then
         "NearbySharing__external_sharing_provider_enabled" \
         "NearbySharing__enable_mosey_transport" \
         "NearbySharing__enable_mosey" \
+        "NearbySharing__enable_akita_mosey" \
         "MoseyTransport__enable_mosey" \
         "ExternalSharingProvider__enabled"; do
         "$SQLITE3" "$phenotype_db" \
@@ -207,6 +210,34 @@ am broadcast \
   --ez android.intent.extra.REPLACING false \
   2>>"$LOGFILE"
 log "PACKAGE_ADDED broadcast sent"
+
+# ── Load virtual wonder kernel module ─────────────────────────────────────
+KO_PATH="/vendor/lib/modules/wonder_mosey_wild.ko"
+[ -f "$KO_PATH" ] || KO_PATH="/system/vendor/lib/modules/wonder_mosey_wild.ko"
+[ -f "$KO_PATH" ] || KO_PATH="$MODULE_DIR/system/vendor/lib/modules/wonder_mosey_wild.ko"
+
+if [ -f "$KO_PATH" ]; then
+  if [ ! -d /sys/module/wonder_mosey_wild ]; then
+    log "loading kernel module via insmod $KO_PATH"
+    ins_out="$(insmod "$KO_PATH" 2>&1)"
+    rc=$?
+    log "insmod rc=$rc: ${ins_out:-success}"
+  else
+    log "kernel module wonder_mosey_wild already loaded"
+  fi
+
+  RENAME_BIN="/vendor/bin/rename_phy"
+  [ -x "$RENAME_BIN" ] || RENAME_BIN="/system/vendor/bin/rename_phy"
+  [ -x "$RENAME_BIN" ] || RENAME_BIN="$MODULE_DIR/system/vendor/bin/rename_phy"
+  if [ -x "$RENAME_BIN" ]; then
+    phy_idx="$(cat /sys/module/wonder_mosey_wild/parameters/phy_index 2>/dev/null)"
+    [ -z "$phy_idx" ] && phy_idx="0"
+    log "invoking rename_phy $phy_idx wonder"
+    "$RENAME_BIN" "$phy_idx" wonder >>"$LOGFILE" 2>&1
+  fi
+else
+  log "wonder_mosey_wild.ko not found"
+fi
 
 # ── Start mosey_server ─────────────────────────────────────────────────────
 if [ -f "$PIDFILE" ]; then

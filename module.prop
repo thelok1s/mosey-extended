@@ -3,4 +3,4 @@ name=mosey-extended
 version=v3.0
 versionCode=3
 author=lok1s
-description=Enables Quick Share mosey AirDrop transport on Pixel 8 Pro and other non-Pixel-10 devices via Phenotype injection + MoseyApp reinstall
+description=Enables Quick Share mosey AirDrop transport on Pixel 8 / 8a / 8 Pro and other non-Pixel-10 devices via Phenotype injection + MoseyApp reinstall

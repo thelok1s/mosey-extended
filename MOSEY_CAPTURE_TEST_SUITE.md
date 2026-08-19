@@ -1,7 +1,7 @@
 # Mosey ↔ AirDrop Wire-Protocol Capture — Test Suite
 
 **Goal**: Capture every layer Mosey uses during a real Quick Share ↔ AirDrop transfer
-with an Apple device. We then diff against our Pixel 8 Pro emulation attempts to
+with an Apple device. We then diff against our Pixel 8 / 8a / 8 Pro emulation attempts to
 identify the exact protocol gaps.
 
 The **single highest-value artifact** is the `nlmon0` netlink pcap during Scenario A
